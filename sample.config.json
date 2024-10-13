@@ -1,0 +1,48 @@
+{
+  "simulate": true,
+  "srcChains": [
+    {
+      "chainId": 1,
+      "pollingInterval": 1000,
+      "blockRange": 5,
+      "confirmation": {
+        "0.001": 0,
+        "0.1": 1,
+        "1": 2
+      }
+    },
+    {
+      "chainId": 10,
+      "pollingInterval": 1000,
+      "blockRange": 1,
+      "confirmation": {
+        "0.001": 0,
+        "0.1": 0,
+        "1": 0
+      }
+    },
+    {
+      "chainId": 42161,
+      "pollingInterval": 1000,
+      "blockRange": 1,
+      "confirmation": {
+        "0.001": 0,
+        "0.1": 0,
+        "1": 0
+      }
+    }
+  ],
+  "dstChains": [
+    {
+      "chainId": 8453,
+      "supportTokens": [
+        {
+          "address": "0x4200000000000000000000000000000000000006",
+          "symbol": "WETH",
+          "minAmount": 0.001,
+          "maxAmount": 3
+        }
+      ]
+    }
+  ]
+}

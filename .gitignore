@@ -1,0 +1,7 @@
+node_modules
+dist
+
+.env
+error.log
+combined.log
+config.json

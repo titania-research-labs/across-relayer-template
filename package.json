@@ -1,0 +1,33 @@
+{
+  "name": "simple-across-relayer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/adachi-440/simple-across-relayer.git",
+  "author": "adachi_440",
+  "license": "MIT",
+  "devDependencies": {
+    "@across-protocol/sdk-v2": "^0.24.4",
+    "@types/node": "^22.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.11.1",
+    "eslint-config-prettier": "^9.1.0",
+    "ethers": "^5.7.2",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "viem": "^2.19.3",
+    "winston": "^3.14.1"
+  },
+  "scripts": {
+    "build": "rm -rf ./dist && tsc",
+    "start": "pnpm run build && node dist/index.js",
+    "dev": "nodemon -w src -e ts",
+    "test": "pnpm run build && node dist/test.js",
+    "format": "pnpm exec prettier --cache --write .",
+    "lint": "pnpm exec eslint --cache ./src/**/*.ts",
+    "lint:fix": "pnpm run lint --fix --quiet"
+  }
+}
