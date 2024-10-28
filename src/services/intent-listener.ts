@@ -12,7 +12,7 @@ import { logger } from '../logger';
 import { AcrossDepositEventLog, AcrossFillOrder } from '../types';
 
 export class IntentListenerService {
-  constructor(readonly config: Config) { }
+  constructor(readonly config: Config) {}
 
   async listen(
     chain: SrcChainConfig,
