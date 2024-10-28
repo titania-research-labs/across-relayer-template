@@ -2,17 +2,12 @@ import {
   BaseError,
   ContractFunctionExecutionError,
   ContractFunctionRevertedError,
-  parseEther,
-  parseGwei,
 } from 'viem';
 import { Config, DstChainConfig } from '../config';
-import { CHAIN_IDs, GAS_USED_PER_SPOKE_POOL_FILL, SPOKE_POOL_ABI } from '../constants';
+import { CHAIN_IDs, SPOKE_POOL_ABI } from '../constants';
 import { logger } from '../logger';
 import { AcrossFillOrder } from '../types';
-import { relayFeeCalculator } from "@across-protocol/sdk-v2"
-import { BigNumber, ethers } from 'ethers';
-import { findClosestBlockByTimestamp, multiCall } from '../utils';
-import * as sdk from '@across-protocol/sdk-v2';
+
 export class IntentFillerService {
   private readonly dstChain: DstChainConfig;
   private readonly simulateMode: boolean;
@@ -81,16 +76,12 @@ export class IntentFillerService {
   }
 
   private async simulate() {
-    const gas = await this.calculateGas();
-    logger.debug(`Calculated gas: ${gas}`);
-
     const { request } = await this.dstChain.publicClient.simulateContract({
       account: this.dstChain.walletClient.account,
       address: this.dstChain.spokePoolAddress,
       abi: SPOKE_POOL_ABI,
       functionName: 'fillV3Relay',
       args: [this.fillOrder.order, this.fillOrder.dstChainId],
-      gasPrice: gas,
     });
 
     if (this.simulateMode) {
@@ -100,84 +91,5 @@ export class IntentFillerService {
     }
 
     return request;
-  }
-
-  private async calculateRelayerFee() {
-    const closestBlock = await findClosestBlockByTimestamp(this.fillOrder.quoteTimestamp);
-    const [currentUt, nextUt, rawL1TokenConfig] = await multiCall(this.fillOrder.order.inputAmount, closestBlock);
-
-    const parsedL1TokenConfig =
-      sdk.contracts.acrossConfigStore.Client.parseL1TokenConfig(
-        String(rawL1TokenConfig.result)
-      );
-    const rateModel =
-      parsedL1TokenConfig.rateModel;
-    const lpFeePct = sdk.lpFeeCalculator.calculateRealizedLpFeePct(
-      rateModel,
-      BigNumber.from(currentUt.result),
-      BigNumber.from(nextUt.result)
-    );
-
-    const inputAmout = BigNumber.from(this.fillOrder.order.inputAmount)
-    const outputAmount = BigNumber.from(this.fillOrder.order.outputAmount)
-
-    const lpFeeTotal = inputAmout.mul(lpFeePct).div(ethers.constants.WeiPerEther);
-    const relayerFeeTotal = inputAmout.sub(outputAmount).sub(lpFeeTotal)
-    return parseInt(relayerFeeTotal.toString())
-  }
-
-  private async calculateGas() {
-    let gas = parseGwei('0.01');
-
-    if (this.fillOrder.order.originChainId == BigInt(CHAIN_IDs.MAINNET)) {
-      return gas;
-    }
-
-
-    const relayerFee = await this.calculateRelayerFee();
-
-    if (relayerFee < 0) {
-      return gas
-    }
-
-    if (this.fillOrder.order.outputAmount < parseEther('0.1')) {
-      gas = BigInt(
-        Math.ceil(Number((relayerFee * 0.7) / GAS_USED_PER_SPOKE_POOL_FILL))
-      );
-    } else if (
-      this.fillOrder.order.outputAmount > parseEther('0.1') &&
-      this.fillOrder.order.outputAmount < parseEther('0.4')
-    ) {
-      gas = BigInt(
-        Math.ceil(Number((relayerFee * 0.35) / GAS_USED_PER_SPOKE_POOL_FILL))
-      );
-    } else if (
-      this.fillOrder.order.outputAmount > parseEther('0.4') &&
-      this.fillOrder.order.outputAmount < parseEther('1')
-    ) {
-      gas = BigInt(
-        Math.ceil(Number((relayerFee * 0.3) / GAS_USED_PER_SPOKE_POOL_FILL))
-      );
-    } else if (
-      this.fillOrder.order.outputAmount > parseEther('1') &&
-      this.fillOrder.order.outputAmount < parseEther('2')
-    ) {
-      gas = BigInt(
-        Math.ceil(Number((relayerFee * 0.07) / GAS_USED_PER_SPOKE_POOL_FILL))
-      );
-    } else if (
-      this.fillOrder.order.outputAmount > parseEther('2') &&
-      this.fillOrder.order.outputAmount < parseEther('3')
-    ) {
-      gas = BigInt(
-        Math.ceil(Number((relayerFee * 0.035) / GAS_USED_PER_SPOKE_POOL_FILL))
-      );
-    }
-
-    if (Number(this.fillOrder.dstChainId) == (CHAIN_IDs.BLAST)) {
-      gas = BigInt(Math.ceil(Number(gas) / 100))
-    }
-
-    return gas;
   }
 }

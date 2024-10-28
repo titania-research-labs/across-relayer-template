@@ -1,8 +1,6 @@
 import { Address, createPublicClient, erc20Abi, http } from 'viem';
-import { ACROSS_CONFIG_STORE_ABI, ACROSS_CONFIG_STORE_ADDRESS, HUB_POOL_ABI, HUB_POOL_ADDRESS, SPOKE_POOL_ADDRESSES, WETH_ADDRESSES } from './constants';
+import { SPOKE_POOL_ADDRESSES } from './constants';
 import { DstChainConfig } from './config';
-import { logger } from './logger';
-import { mainnet } from 'viem/chains'
 
 export const getSpokePoolAddress = (chainId: number) => {
   return SPOKE_POOL_ADDRESSES[chainId as keyof typeof SPOKE_POOL_ADDRESSES];
