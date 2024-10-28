@@ -19,12 +19,18 @@ $ pnpm install
 Copy the `.env.example` file to create a `.env` file and set the necessary environment variables.
 
 ```sh
-$ cp .env.example .env
+$ cp .example.env .env
 ```
 
 In the `.env` file, set the RPC provider URLs and the private key for each blockchain.
 
 ### 3. Configure `config.json`
+
+Copy the `sample.config.json` file to create a `config.json` file
+
+```sh
+$ cp sample.config.json config.json
+```
 
 The `config.json` file contains settings for source chains and destination chains. Below are detailed explanations of each configuration item.
 
