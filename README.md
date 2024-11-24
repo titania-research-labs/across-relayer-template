@@ -19,7 +19,7 @@ $ pnpm install
 Copy the `.env.example` file to create a `.env` file and set the necessary environment variables.
 
 ```sh
-$ cp .example.env .env
+$ cp .env.example .env
 ```
 
 In the `.env` file, set the RPC provider URLs and the private key for each blockchain.
