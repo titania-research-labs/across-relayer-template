@@ -45,7 +45,7 @@ The `config.json` file contains settings for source chains and destination chain
 - **Description**: Settings for source chains. Each chain configuration includes the following items:
   - `chainId`: Specifies the chain ID.
   - `pollingInterval`: Specifies the interval (in milliseconds) for polling the blockchain state.
-  - `blockRange`: Specifies the range of blocks to check during polling.
+  - `webSocket`: Specifies whether to use websocket to get on-chain events.
   - `confirmation`: Specifies the number of blocks required for transaction confirmation. The key is the transaction amount, and the value is the number of blocks required for confirmation.
 
 ```json
@@ -53,7 +53,7 @@ The `config.json` file contains settings for source chains and destination chain
   {
     "chainId": 1,
     "pollingInterval": 1000,
-    "blockRange": 5,
+    "webSocket": true,
     "confirmation": {
       "100": 1,
       "1000": 2
@@ -71,6 +71,7 @@ The `config.json` file contains settings for source chains and destination chain
   - `supportTokens`: Specifies the list of supported tokens. Each token configuration includes the following items:
     - `address`: Specifies the contract address of the token.
     - `symbol`: Specifies the symbol of the token.
+    - `decimals`: Specifies the decimals of the token.
     - `minAmount`: Specifies the minimum amount of the token to be sent.
     - `maxAmount`: Specifies the maximum amount of the token to be sent.
 
@@ -82,6 +83,7 @@ The `config.json` file contains settings for source chains and destination chain
       {
         "address": "0x4200000000000000000000000000000000000006",
         "symbol": "WETH",
+        "decimals": 18,
         "minAmount": 0.0001,
         "maxAmount": 1
       }
@@ -106,7 +108,7 @@ $ pnpm run build
 Builds the project and starts the relayer.
 
 ```sh
-$ pnpm start
+$ pnpm run start
 ```
 
 ### `dev`
