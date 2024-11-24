@@ -3,9 +3,13 @@ import { Config, loadConfig } from './config';
 import { IntentListenerService } from './services/intent-listener';
 import { AcrossFillOrder } from './types';
 import { IntentFillerService } from './services/intent-filler';
-import { getSpokePoolAddress, checkEnoughAllowance } from './utils';
+import { getSpokePoolAddress, checkEnoughAllowance, approveToken } from './utils';
 
 async function main() {
+  await runRelayer();
+}
+
+const runRelayer = async () => {
   logger.info('Starting Relayer...');
 
   const config = loadConfig();
@@ -21,10 +25,12 @@ async function main() {
       );
 
       if (!isEnoughAllowance) {
-        logger.error(
+        logger.warn(
           `Not enough allowance of ${token.symbol} on ${dstChain.chainId}`
         );
-        process.exit(1);
+        logger.info(`Approving ${token.symbol} on ${dstChain.chainId}`);
+        await approveToken(token.address, spokePoolAddress, dstChain);
+        logger.info(`Approved ${token.symbol} on ${dstChain.chainId}`);
       }
     }
   }
@@ -40,8 +46,13 @@ async function main() {
       await fillIntentService.fill();
     };
 
-    intentListenerService.listen(srcChain, onEvent);
+    let unwatch = await intentListenerService.listen(srcChain, onEvent);
+
+    setInterval(async () => {
+      unwatch();
+      unwatch = await intentListenerService.listen(srcChain, onEvent);
+    }, 30 * 60 * 1000);
   }
-}
+};
 
 main();

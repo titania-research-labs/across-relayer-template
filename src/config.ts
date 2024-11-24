@@ -5,6 +5,7 @@ import {
   http,
   PublicClient,
   WalletClient,
+  webSocket,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import CONFIG from '../config.json';
@@ -18,6 +19,7 @@ dotenv.config();
 export type Token = {
   address: Address;
   symbol: string;
+  decimals: number;
   minAmount: number;
   maxAmount: number;
 };
@@ -27,7 +29,7 @@ export type SrcChainConfig = {
   spokePoolAddress: Address;
   publicClient: PublicClient;
   pollingInterval: number;
-  blockRange: number;
+  webSocket: boolean;
   confirmation: {
     [key: string]: number | undefined;
   };
@@ -62,7 +64,11 @@ export function loadConfig(): Config {
     }
 
     const publicClient = createPublicClient({
-      transport: http(process.env[`RPC_PROVIDER_${chainId}`]),
+      transport: chain.webSocket
+        ? webSocket(process.env[`WS_RPC_PROVIDER_${chainId}`], {
+          keepAlive: { interval: 1_000 },
+        })
+        : http(process.env[`RPC_PROVIDER_${chainId}`]),
     });
 
     return {
@@ -70,8 +76,8 @@ export function loadConfig(): Config {
       spokePoolAddress: SPOKE_POOL_ADDRESSES[chainId],
       publicClient: publicClient,
       pollingInterval: chain.pollingInterval,
+      webSocket: chain.webSocket,
       confirmation: chain.confirmation,
-      blockRange: chain.blockRange,
     };
   }) as SrcChainConfig[];
 

@@ -21,12 +21,10 @@ export class IntentListenerService {
       config: Config
     ) => void | Promise<void>
   ) {
-    let currentBlockNumber = await chain.publicClient.getBlockNumber();
-
-    chain.publicClient.watchContractEvent({
+    const unwatch = chain.publicClient.watchContractEvent({
       address: chain.spokePoolAddress,
       abi: SPOKE_POOL_ABI,
-      pollingInterval: chain.pollingInterval,
+      pollingInterval: chain.webSocket ? undefined : chain.pollingInterval,
       eventName: 'V3FundsDeposited',
       onLogs: async (logs) => {
         logger.debug(`Found ${logs.length} V3FundsDeposited events`);
@@ -49,12 +47,13 @@ export class IntentListenerService {
         });
 
         await Promise.all(promises);
-        currentBlockNumber = await chain.publicClient.getBlockNumber();
       },
     });
     logger.info(
       `Listening for V3FundsDeposited events on chain id ${chain.chainId}`
     );
+
+    return unwatch;
   }
 
   private async filter(
@@ -115,8 +114,8 @@ export class IntentListenerService {
       }
 
       const isAmountInRange =
-        parseUnits(availableToken.minAmount.toString(), 18) <= outputAmount &&
-        outputAmount <= parseUnits(availableToken.maxAmount.toString(), 18);
+        parseUnits(availableToken.minAmount.toString(), availableToken.decimals) <= outputAmount &&
+        outputAmount <= parseUnits(availableToken.maxAmount.toString(), availableToken.decimals);
       const parsedOutputAmount = formatEther(outputAmount);
 
       if (!isAmountInRange) {

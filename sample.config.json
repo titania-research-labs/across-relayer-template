@@ -4,7 +4,7 @@
     {
       "chainId": 1,
       "pollingInterval": 1000,
-      "blockRange": 5,
+      "webSocket": true,
       "confirmation": {
         "0.001": 0,
         "0.1": 1,
@@ -14,7 +14,7 @@
     {
       "chainId": 10,
       "pollingInterval": 1000,
-      "blockRange": 1,
+      "webSocket": true,
       "confirmation": {
         "0.001": 0,
         "0.1": 0,
@@ -24,7 +24,7 @@
     {
       "chainId": 42161,
       "pollingInterval": 1000,
-      "blockRange": 1,
+      "webSocket": true,
       "confirmation": {
         "0.001": 0,
         "0.1": 0,
@@ -39,6 +39,7 @@
         {
           "address": "0x4200000000000000000000000000000000000006",
           "symbol": "WETH",
+          "decimals": 18,
           "minAmount": 0.001,
           "maxAmount": 3
         }
