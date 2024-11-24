@@ -12,7 +12,7 @@ import { logger } from '../logger';
 import { AcrossDepositEventLog, AcrossFillOrder } from '../types';
 
 export class IntentListenerService {
-  constructor(readonly config: Config) { }
+  constructor(readonly config: Config) {}
 
   async listen(
     chain: SrcChainConfig,
@@ -114,8 +114,15 @@ export class IntentListenerService {
       }
 
       const isAmountInRange =
-        parseUnits(availableToken.minAmount.toString(), availableToken.decimals) <= outputAmount &&
-        outputAmount <= parseUnits(availableToken.maxAmount.toString(), availableToken.decimals);
+        parseUnits(
+          availableToken.minAmount.toString(),
+          availableToken.decimals
+        ) <= outputAmount &&
+        outputAmount <=
+          parseUnits(
+            availableToken.maxAmount.toString(),
+            availableToken.decimals
+          );
       const parsedOutputAmount = formatEther(outputAmount);
 
       if (!isAmountInRange) {

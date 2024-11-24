@@ -66,8 +66,8 @@ export function loadConfig(): Config {
     const publicClient = createPublicClient({
       transport: chain.webSocket
         ? webSocket(process.env[`WS_RPC_PROVIDER_${chainId}`], {
-          keepAlive: { interval: 1_000 },
-        })
+            keepAlive: { interval: 1_000 },
+          })
         : http(process.env[`RPC_PROVIDER_${chainId}`]),
     });
 

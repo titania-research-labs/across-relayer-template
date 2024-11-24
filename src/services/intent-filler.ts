@@ -48,7 +48,9 @@ export class IntentFillerService {
 
         const hash = await this.dstChain.walletClient.writeContract(request);
 
-        logger.debug(`Filled order on chain ${this.fillOrder.dstChainId}: ${hash}`);
+        logger.debug(
+          `Filled order on chain ${this.fillOrder.dstChainId}: ${hash}`
+        );
 
         const transaction =
           await this.dstChain.publicClient.waitForTransactionReceipt({ hash });
@@ -98,22 +100,31 @@ export class IntentFillerService {
       functionName: 'fillV3Relay',
       args: [this.fillOrder.order, this.fillOrder.dstChainId],
     };
-    if (gas.gasPrice !== BigInt(0) && gas.maxFeePerGas == BigInt(0) && gas.maxPriorityFeePerGas == BigInt(0)) {
+    if (
+      gas.gasPrice !== BigInt(0) &&
+      gas.maxFeePerGas == BigInt(0) &&
+      gas.maxPriorityFeePerGas == BigInt(0)
+    ) {
       simulateContractParams = {
         ...simulateContractParams,
         gasPrice: gas.gasPrice,
-        gas: BigInt(GAS_USED_PER_SPOKE_POOL_FILL * 5)
+        gas: BigInt(GAS_USED_PER_SPOKE_POOL_FILL * 5),
       };
-    } else if (gas.maxFeePerGas !== BigInt(0) && gas.maxPriorityFeePerGas !== BigInt(0)) {
+    } else if (
+      gas.maxFeePerGas !== BigInt(0) &&
+      gas.maxPriorityFeePerGas !== BigInt(0)
+    ) {
       simulateContractParams = {
         ...simulateContractParams,
         maxFeePerGas: gas.maxFeePerGas,
         maxPriorityFeePerGas: gas.maxPriorityFeePerGas,
-        gas: BigInt(GAS_USED_PER_SPOKE_POOL_FILL * 2)
+        gas: BigInt(GAS_USED_PER_SPOKE_POOL_FILL * 2),
       };
     }
 
-    const { request } = await this.dstChain.publicClient.simulateContract(simulateContractParams);
+    const { request } = await this.dstChain.publicClient.simulateContract(
+      simulateContractParams
+    );
 
     if (this.simulateMode) {
       logger.info(`Simulated fillV3Relay transaction`);
@@ -162,7 +173,7 @@ export class IntentFillerService {
     return {
       gasPrice: BigInt(0),
       maxFeePerGas: BigInt(0),
-      maxPriorityFeePerGas: BigInt(0)
+      maxPriorityFeePerGas: BigInt(0),
     };
   }
 }

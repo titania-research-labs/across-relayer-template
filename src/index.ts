@@ -3,7 +3,11 @@ import { Config, loadConfig } from './config';
 import { IntentListenerService } from './services/intent-listener';
 import { AcrossFillOrder } from './types';
 import { IntentFillerService } from './services/intent-filler';
-import { getSpokePoolAddress, checkEnoughAllowance, approveToken } from './utils';
+import {
+  getSpokePoolAddress,
+  checkEnoughAllowance,
+  approveToken,
+} from './utils';
 
 async function main() {
   await runRelayer();
@@ -48,10 +52,13 @@ const runRelayer = async () => {
 
     let unwatch = await intentListenerService.listen(srcChain, onEvent);
 
-    setInterval(async () => {
-      unwatch();
-      unwatch = await intentListenerService.listen(srcChain, onEvent);
-    }, 30 * 60 * 1000);
+    setInterval(
+      async () => {
+        unwatch();
+        unwatch = await intentListenerService.listen(srcChain, onEvent);
+      },
+      30 * 60 * 1000
+    );
   }
 };
 
